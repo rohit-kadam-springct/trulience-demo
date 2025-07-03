@@ -1,5 +1,6 @@
 "use client";
 
+import { useUrlParams } from "@/utils/useUrlParams";
 import { TrulienceAvatar } from "@trulience/react-sdk";
 import { useRef, useState } from "react";
 
@@ -9,8 +10,13 @@ const enum ConnectionState {
   DISCONNECTED = 0
 }
 
+type AvatarQuery = {
+  avatarId: string;
+};
+
 export default function Home() {
   const avatarRef = useRef<TrulienceAvatar>(null);
+  const { avatarId } = useUrlParams<AvatarQuery>();
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED)
 
   const handleOnConnect = () => {
@@ -19,13 +25,21 @@ export default function Home() {
     trulienceObj?.connectGateway();
   };
 
+  if ( !avatarId ) {
+    return (
+      <div className="w-screen h-screen relative overflow-hidden flex justify-center items-center text-xl">
+        Please pass the avatarId through the URL using a query parameter, like ?avatarId=xxxxx
+      </div>
+    )
+  }
+
   return (
     <div className="w-screen h-screen relative overflow-hidden">
       {/* Wrapper to control height responsively */}
       <div className="w-full h-1/2 md:h-full">
         <TrulienceAvatar
           ref={avatarRef}
-          avatarId={"6269824970146662678"}
+          avatarId={avatarId}
           url="https://trulience.com/sdk/trulience.sdk.js"
           autoConnect={false}
           prefetchAvatar={true}
