@@ -22,7 +22,13 @@ export default function Home() {
   const handleOnConnect = () => {
     const trulienceObj = avatarRef.current?.getTrulienceObject();
     setConnectionState(ConnectionState.CONNECTING)
-    trulienceObj?.connectGateway();
+    
+    if(connectionState === ConnectionState.DISCONNECTED) {
+      trulienceObj?.connectGateway();
+    } else {
+      trulienceObj?.disconnectGateway()
+    }
+
   };
 
   if ( !avatarId ) {
@@ -46,6 +52,9 @@ export default function Home() {
           eventCallbacks={{
             "websocket-connect": () => {
               setConnectionState(ConnectionState.CONNECTED)
+            },
+            "websocket-close" : () => {
+              setConnectionState(ConnectionState.DISCONNECTED)
             }
           }}
           avatarParams={{
@@ -68,8 +77,8 @@ export default function Home() {
 
       {/* Connect Button */}
       <button
-        className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded flex items-center gap-2 cursor-pointer
-      absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10"
+        className={`${ connectionState === ConnectionState.CONNECTED ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"}  text-white font-semibold py-2 px-4 rounded flex items-center gap-2 cursor-pointer
+      absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10`}
         onClick={handleOnConnect}
       >
         <svg
